@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">ProbonoNav</string>
+    <string name="destination_name">목적지 이름</string>
+    <string name="destination_x_coordinate">목적지 x 좌표</string>
+    <string name="require">필수 값</string>
+    <string name="destination_y_coordinate">목적지 y 좌표</string>
+    <string name="POI_id_name">POI ID</string>
+    <string name="exit_on_arrived">도착시 앱 종료</string>
+    <string name="execute">execute</string>
+    <string name="destination">목적지 명</string>
+</resources>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10m"
+        android:layout_margin="5sp"
+        android:gravity="center"
+        android:textSize="25sp"
+        android:background="@drawable/edge"
+        android:textColor="#4C4C4C"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:layout_margin="5sp"
+        android:textSize="25sp"
+        android:text="서울시 중구 1111111111111111111111111111111111"
+        android:gravity="start"
+        android:autoSizeTextType="uniform"
+        android:textColor="#747474"/>
+
+
+</LinearLayout>

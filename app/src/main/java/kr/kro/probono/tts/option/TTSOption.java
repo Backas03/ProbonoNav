@@ -1,4 +1,4 @@
-package kr.kro.probononav.tts.option;
+package kr.kro.probono.tts.option;
 
 public class TTSOption {
 

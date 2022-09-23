@@ -1,9 +1,7 @@
-package kr.kro.probononav.tts;
+package kr.kro.probono.tts;
 
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaCodec;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -22,7 +20,7 @@ import java.util.Queue;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import kr.kro.probononav.tts.option.TTSOption;
+import kr.kro.probono.tts.option.TTSOption;
 
 public class TextToSpeechService extends Service implements MediaPlayer.OnPreparedListener {
 
@@ -95,7 +93,7 @@ public class TextToSpeechService extends Service implements MediaPlayer.OnPrepar
                         try {
                             play(textToSpeech);
                         } catch (IOException ignore) {
-                            getApplicationContext().getSystemService(ALARM_SERVICE)
+                            getApplicationContext().getSystemService(ALARM_SERVICE);
                         }
                     }
                 });

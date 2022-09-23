@@ -1,4 +1,4 @@
-package kr.kro.probononav.adapter;
+package kr.kro.probono.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,7 +16,7 @@ import com.skt.Tmap.poi_item.TMapPOIItem;
 
 import java.util.List;
 
-import kr.kro.probononav.R;
+import kr.kro.probono.R;
 
 public class SearchResultListViewAdapter extends ArrayAdapter<TMapPOIItem> {
 

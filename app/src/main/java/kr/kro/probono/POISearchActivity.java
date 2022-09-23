@@ -1,4 +1,4 @@
-package kr.kro.probononav;
+package kr.kro.probono;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
+
+import kr.kro.probono.R;
 
 public class POISearchActivity extends AppCompatActivity {
 

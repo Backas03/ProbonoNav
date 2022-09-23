@@ -1,4 +1,4 @@
-package kr.kro.probononav.tts;
+package kr.kro.probono.tts;
 
 public class TextToSpeech {
 

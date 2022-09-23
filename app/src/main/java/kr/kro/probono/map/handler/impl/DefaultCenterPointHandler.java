@@ -1,11 +1,11 @@
-package kr.kro.probononav.map.handler.impl;
+package kr.kro.probono.map.handler.impl;
 
 import android.location.Location;
 import android.location.LocationManager;
 
 import com.skt.Tmap.TMapView;
 
-import kr.kro.probononav.map.handler.InfCenterPointHandler;
+import kr.kro.probono.map.handler.InfCenterPointHandler;
 
 public class DefaultCenterPointHandler implements InfCenterPointHandler {
 

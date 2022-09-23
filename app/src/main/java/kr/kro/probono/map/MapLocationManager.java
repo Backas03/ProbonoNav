@@ -1,10 +1,9 @@
-package kr.kro.probononav.map;
+package kr.kro.probono.map;
 
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Process;
@@ -13,10 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
-import com.skt.Tmap.TMapView;
-
-import kr.kro.probononav.map.handler.InfCenterPointHandler;
-import kr.kro.probononav.map.handler.impl.DefaultCenterPointHandler;
+import kr.kro.probono.map.handler.InfCenterPointHandler;
+import kr.kro.probono.map.handler.impl.DefaultCenterPointHandler;
 
 public class MapLocationManager extends Activity {
 

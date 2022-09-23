@@ -1,4 +1,4 @@
-package kr.kro.probononav.map;
+package kr.kro.probono.map;
 
 import android.os.Bundle;
 import android.widget.FrameLayout;
@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.skt.Tmap.TMapView;
 
-import kr.kro.probononav.APIKeys;
-import kr.kro.probononav.R;
+import kr.kro.probono.APIKeys;
+import kr.kro.probono.R;
 
 public class MapActivity extends AppCompatActivity {
 

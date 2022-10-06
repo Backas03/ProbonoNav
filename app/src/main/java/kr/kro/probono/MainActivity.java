@@ -23,23 +23,22 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
-import com.skt.Tmap.MapUtils;
 import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapTapi;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.util.Set;
 import java.util.UUID;
 
-import kr.kro.probono.R;
+import kr.kro.probono.bluetooth.ConnectedTask;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String MAC_ADDRESS = "E4:5F:01:69:10:9C";
+    private static final String MAC_ADDRESS = "2C:6D:C1:14:94:EC";
 
-    private static final UUID uuid = UUID.fromString("beb5483e-36e1-4688-b7f5-ea07361b26a8");
+    private static UUID uuid;
 
     private BluetoothDevice device;
     private TMapTapi tapi;
@@ -51,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox exitOnArrive;
     private Button execute;
 
+    private ConnectedTask task;
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -65,6 +66,20 @@ public class MainActivity extends AppCompatActivity {
         exitOnArrive = findViewById(R.id.view_navigate_exit_on_arrive_CheckBox);
         execute = findViewById(R.id.view_navigate_execute_button);
 
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 100);
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
+        initBT();
+
         tapi = new TMapTapi(MainActivity.this);
         tapi.setOnAuthenticationListener(new TMapTapi.OnAuthenticationListenerCallback() {
             @Override
@@ -73,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
                 System.out.println("installed : " + tapi.isTmapApplicationInstalled());
                 System.out.println(tapi.invokeTmap());
+
             }
 
             @Override
@@ -90,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     public boolean invokeNavigate(String szDestName, float fX, float fY, int poiid, boolean isAutoClose) {
         if (szDestName != null && szDestName.getBytes().length > 128) {
             byte[] byteTemp = new byte[128];
@@ -99,25 +116,25 @@ public class MainActivity extends AppCompatActivity {
 
         PackageInfo info;
         if (TMapData.invokeStatistics("A0", true)) {
-                        String szInvokeMessage = "tmap://navigate?referrer=com.skt.Tmap&name=";
-                        if (szDestName != null && !szDestName.trim().equals("")) {
-                            szInvokeMessage = szInvokeMessage + szDestName;
-                        } else {
-                            szInvokeMessage = szInvokeMessage + "도착지";
-                        }
-                        if (fX > 0.0F && fY > 0.0F) {
-                            szInvokeMessage = szInvokeMessage + "&lon=" + fX + "&lat=" + fY;
-                        } else if (poiid > 0) {
-                            szInvokeMessage = szInvokeMessage + "&poiid=" + poiid;
-                        }
-                        if (fX > 0.0F && fY > 0.0F || poiid > 0) {
-                            szInvokeMessage = szInvokeMessage + "&autoclose=" + (isAutoClose ? "y" : "n");
-                            Intent intent = new Intent("android.intent.action.MAIN");
-                            intent.setClassName("com.skt.tmap.ku", "com.skt.tmap.ku.IntroActivity");
-                            intent.putExtra("url", szInvokeMessage);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            this.startActivity(intent);
-                        }
+            String szInvokeMessage = "tmap://navigate?referrer=com.skt.Tmap&name=";
+            if (szDestName != null && !szDestName.trim().equals("")) {
+                szInvokeMessage = szInvokeMessage + szDestName;
+            } else {
+                szInvokeMessage = szInvokeMessage + "도착지";
+            }
+            if (fX > 0.0F && fY > 0.0F) {
+                szInvokeMessage = szInvokeMessage + "&lon=" + fX + "&lat=" + fY;
+            } else if (poiid > 0) {
+                szInvokeMessage = szInvokeMessage + "&poiid=" + poiid;
+            }
+            if (fX > 0.0F && fY > 0.0F || poiid > 0) {
+                szInvokeMessage = szInvokeMessage + "&autoclose=" + (isAutoClose ? "y" : "n");
+                Intent intent = new Intent("android.intent.action.MAIN");
+                intent.setClassName("com.skt.tmap.ku", "com.skt.tmap.ku.IntroActivity");
+                intent.putExtra("url", szInvokeMessage);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                this.startActivity(intent);
+            }
         }
         return true;
     }
@@ -176,13 +193,69 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(b);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (task != null) task.close();
+    }
 
+    private void initBT() {
+        System.out.println("target mac address: " + MAC_ADDRESS);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Set<BluetoothDevice> devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices();
+        if (devices.size() == 0) {
+            System.out.println("device not found");
+            return;
+        }
+
+        for (BluetoothDevice a : devices) {
+            System.out.println(a);
+            if (a.getAddress().equals(MAC_ADDRESS)) {
+                System.out.println("detected - " + a);
+                device = a;
+                break;
+            }
+        }
+        if (device == null) {
+            System.out.println("device not found");
+            return;
+        }
+
+        System.out.println("device detected - " + device);
+
+        BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
+
+        try {
+            uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+            BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuid);
+            socket.connect();
+            MainActivity.this.task = new ConnectedTask(socket);
+            Log.d("Bluetooth", "create a socket for " + device.getName());
+            MainActivity.this.task.start();
+        } catch (IOException e) {
+            Log.d("Bluetooth", "socket create failed " + e.getMessage());
+        }
+
+    }
 
     private void initBluetooth() {
         System.out.println("target mac address: " + MAC_ADDRESS);
 
+
         BluetoothProfile.ServiceListener listener = new BluetoothProfile.ServiceListener() {
-            @RequiresApi(api = Build.VERSION_CODES.Q)
+
+
+
             @Override
             public void onServiceConnected(int profile, BluetoothProfile proxy) {
                 for (BluetoothDevice a : proxy.getConnectedDevices()) {
@@ -199,7 +272,25 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 System.out.println("device detected - " + device);
+                try {
+                    UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+                    MainActivity.this.task = new ConnectedTask(device.createRfcommSocketToServiceRecord(uuid));
+                    Log.d("Bluetooth", "create a socket for " + device.getName());
+                } catch (IOException e) {
+                    Log.d("Bluetooth", "socket create failed " + e.getMessage());
+                }
 
+                /*
                 if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     //    ActivityCompat#requestPermissions
@@ -244,11 +335,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+                 */
+            }
+
+
             @Override
             public void onServiceDisconnected(int profile) {
-                System.out.println("disconnected " + profile);
+                System.out.println("disconnected: " + profile);
             }
+
         };
         BluetoothAdapter.getDefaultAdapter().getProfileProxy(this, listener, BluetoothProfile.STATE_CONNECTED);
+
     }
+
 }
